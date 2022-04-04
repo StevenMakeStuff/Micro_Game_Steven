@@ -8,17 +8,19 @@ public class Enemy : MonoBehaviour
     [SerializeField] int maxHealth = 5;
     EnemyMover enemyMover;
     AudioSource audioSource;
+    Rigidbody2D enemyRigidbody;
     [Tooltip("Set before you try a game.")]
     [SerializeField] GameManager gameManager;
     [SerializeField] AudioClip hurtSound;
     [SerializeField] int pointsOnDestruction;
     private bool isBeingHit;
-
+    public bool cannotTouchEnemies;
 
     private void Awake()
     {
         enemyMover = GetComponent<EnemyMover>();
         audioSource = GetComponent<AudioSource>();
+        enemyRigidbody = GetComponent<Rigidbody2D>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

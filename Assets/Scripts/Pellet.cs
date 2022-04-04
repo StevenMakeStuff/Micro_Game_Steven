@@ -5,6 +5,18 @@ using UnityEngine;
 public class Pellet : MonoBehaviour
 {
     [SerializeField] int pointsOnDestruction;
+    public bool done;
+    private GameManager gm;
+
+    private void Start()
+    {
+        GameObject gameM = GameObject.FindGameObjectWithTag("GM");
+
+        if (gameM != null)
+        {
+            gm = gameM.GetComponent<GameManager>();
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -13,8 +25,9 @@ public class Pellet : MonoBehaviour
             return;
 
         // Otherwise, the player is contacted to add the score to the screen
-        gameObject.SetActive(false);
+        done = true;
         collision.GetComponent<Player>().AddToScore(pointsOnDestruction);
-        
+        gm.AddToList(gameObject);
+        gameObject.SetActive(false);
     }
 }

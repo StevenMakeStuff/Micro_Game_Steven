@@ -186,6 +186,8 @@ public class PlayerController : MonoBehaviour
                 {
                     return true;
                 }
+                //message = health > 0 ? "Player is Alive" : "Player is Dead";
+
                 else
                 {
                     return false;

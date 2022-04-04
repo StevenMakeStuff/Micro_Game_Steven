@@ -59,8 +59,8 @@ public class Player : MonoBehaviour
             canBeKilled = false;
             audioSource.PlayOneShot(deathSound, 1f);
             //respawnBegan = true;
-            collision.GetComponent<EnemyMover>().isBeingRespawned = true;
-            collision.GetComponent<EnemyMover>().pathNumber = 0;
+            collision.gameObject.GetComponent<EnemyMover>().isBeingRespawned = true;
+            collision.gameObject.GetComponent<EnemyMover>().pathNumber = 0;
             Deactivate(true);
         }
 

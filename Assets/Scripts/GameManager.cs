@@ -24,13 +24,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI playerLivesText;
     int playerLivesIncreaseScore;
     [SerializeField] GameObject[] enemies;
-    [SerializeField] int totalPellets;
+    public int totalNum;
     [SerializeField] GameObject[] pellets;
+    [SerializeField] List<GameObject> newPellets = new List<GameObject>();
 
     [SerializeField] GameObject gameOverCanvas;
 
-    [Range(1f, 5f)]
-    [SerializeField] float matchResetWait = 1f;
+    [Range(0.1f, 5f)]
+    [SerializeField] float matchResetWait = 0.5f;
     [SerializeField] Vector3 playerStartAndRespawn;
     [SerializeField] Vector2[] enemyStartAndRespawn;
     [SerializeField] Vector2Int middleEnemyAreaExit;
@@ -52,6 +53,7 @@ public class GameManager : MonoBehaviour
         playerLivesText.text = startingLives.ToString();
         playerLives = startingLives;
         grid = gridManager.Grid;
+        ResetEmptyList();
         player.GetComponent<PlayerController>().AssignGrid(grid);
         TotalMatchReset();
         StartCoroutine(UpdatePlayerPos());
@@ -64,6 +66,26 @@ public class GameManager : MonoBehaviour
         {
             gameOver = false;
             GameReset();
+        }
+        
+        //Determine when the enemies cannot touch each other
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            //If enemy has touched final area exit, bool will be set to true
+            if (enemies[i].transform.position.x == finalEnemyAreaExit.x && enemies[i].transform.position.y == finalEnemyAreaExit.y)
+            {
+                enemies[i].GetComponent<Enemy>().cannotTouchEnemies = true;
+            }
+        }
+
+        //Check to see if all pellets have been collected before starting a new round
+        if (totalNum == 136)
+        {
+            gameStart = true;
+            newPellets.Clear();
+            totalNum = 0;
+            ResetEmptyList();
+            TotalMatchReset();
         }
     }
 
@@ -91,12 +113,37 @@ public class GameManager : MonoBehaviour
         StartCoroutine(UpdatePlayerPos());
     }
 
+    //Transfer last pellet collected from the original list into a new list
+    public void AddToList(GameObject pellet)
+    {
+        for (int i = 0; i < newPellets.Count; i++)
+        {
+            //Remove empty element that occurs in the beginning
+            if (i == 0)
+            {
+                newPellets.Add(pellet);
+
+                if (newPellets[0] == null)
+                {
+                    newPellets.RemoveAt(0);
+                }
+            }
+
+            //Adds the pellets to the new list
+            else if (newPellets[i] == null)
+            {
+                newPellets.Add(pellet);
+            }
+        }
+
+        //Adds up when pellet is added
+        totalNum += 1;
+    }
 
     public void IncreaseScore(int points)
     {
         playerScore += points;
         scoreTotalText.text = playerScore.ToString();
-        totalPellets -= 1;
         CheckSpeedIncrease();
         playerLivesIncreaseScore += points;
 
@@ -105,12 +152,6 @@ public class GameManager : MonoBehaviour
             playerLivesIncreaseScore = playerLivesIncreaseScore % 1000;
             playerLives += 1;
             playerLivesText.text = playerLives.ToString();
-        }
-
-        if (totalPellets <= 0)
-        {
-            gameStart = true;
-            TotalMatchReset();
         }
     }
 
@@ -127,7 +168,6 @@ public class GameManager : MonoBehaviour
                     enemies[i].GetComponent<EnemyMover>().IncreaseSpeed(enemySpeedIteration, speedIncreaseThresholdByScore.Length);
                 }
             }
-            
         }
     }
 
@@ -145,6 +185,10 @@ public class GameManager : MonoBehaviour
         {
             playerLives -= 1;
             playerLivesText.text = playerLives.ToString();
+
+            totalNum = 0;
+            newPellets.Clear();
+            ResetEmptyList();
         }
 
         gameStart = false;
@@ -173,15 +217,12 @@ public class GameManager : MonoBehaviour
             if (isPlayerLosingALife)
             {
                 isPlayerLosingALife = false;
-                totalPellets = 0;
 
-                for(int i = 0; i < pellets.Length; i++)
+                for (int i = 0; i < pellets.Length; i++)
                 {
                     pellets[i].SetActive(true);
-                    totalPellets++;
                 }
             }
-            
 
             for (int i = 0; i < enemies.Length; i++)
             {
@@ -189,7 +230,13 @@ public class GameManager : MonoBehaviour
                 enemies[i].GetComponent<EnemyMover>().ResetPathNumber();
                 enemies[i].transform.position = enemyStartAndRespawn[i];
                 enemies[i].GetComponent<EnemyMover>().isBeingRespawned = false;
+                enemies[i].GetComponent<Enemy>().cannotTouchEnemies = false; //If enemy dies and respawns, this will be reset
                 enemies[i].GetComponent<EnemyMover>().BeginPath(enemyStartAndRespawn[i], middleEnemyAreaExit, finalEnemyAreaExit);
+            }
+
+            for (int i = 0; i < pellets.Length; i++)
+            {
+                pellets[i].SetActive(true);
             }
 
             player.GetComponent<PlayerController>().isSpawning = false;
@@ -253,4 +300,12 @@ public class GameManager : MonoBehaviour
         gameOverCanvas.SetActive(false);
     }
 
+    //Reset the size of the duplicate empty list
+    public void ResetEmptyList()
+    {
+        for (int i = 0; i < 1; i++)
+        {
+            newPellets.Add(null);
+        }
+    }
 }

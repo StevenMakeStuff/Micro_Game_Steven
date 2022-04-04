@@ -62,7 +62,7 @@ public class EnemyMover : MonoBehaviour
                 Vector2Int endPosition = path[i + 1].coordinates;
                 float travelPercent = 0f;
 
-                while (travelPercent < 1f)
+                while (travelPercent < 0.95f)
                 {
                     if (isBeingRespawned || isBeingKnockedBack)
                         break;

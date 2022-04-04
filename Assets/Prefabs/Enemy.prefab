@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 897550818782181447}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -174,6 +174,8 @@ MonoBehaviour:
   maxHealth: 5
   gameManager: {fileID: 0}
   hurtSound: {fileID: 8300000, guid: d96f753af63673e4297ed4fc843e0b51, type: 3}
+  pointsOnDestruction: 0
+  cannotTouchEnemies: 0
 --- !u!50 &484973528
 Rigidbody2D:
   serializedVersion: 4
@@ -194,7 +196,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &7762950328207549321
 BoxCollider2D:
   m_ObjectHideFlags: 0
